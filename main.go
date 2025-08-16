@@ -11,6 +11,32 @@ import (
 )
 
 func main() {
+
+
+	reader := bufio.NewReader(os.Stdin)
+
+	fmt.Println("What would you like todo?")
+	fmt.Println("1. Check tasks \n2. Create a task \n3. Exit")
+	fmt.Println("Type the number of the option")
+	choice, _ := reader.ReadString('\n')
+	choice = strings.TrimSpace(choice)
+
+	switch choice {
+	case "1":
+		fmt.Println("Check tasks")
+		showTasks()
+	case "2":
+		task, taskType := createTask(reader)
+		fmt.Println("Task:", task, "with type", taskType, "has been created")
+	case "3":
+		fmt.Println("Program exited")
+		os.Exit(0)
+	default:
+		fmt.Println("Invalid choice")
+	}
+}
+
+func showTasks(){
 	db.Init()
 	ctx := context.Background()
 
@@ -29,27 +55,6 @@ func main() {
 			log.Fatal("Something went wrong", err)
 		}
 		fmt.Println("Task:", task, "| Type:", taskType, "| Completed:", status)
-	}
-
-	reader := bufio.NewReader(os.Stdin)
-
-	fmt.Println("What would you like todo?")
-	fmt.Println("1. Check tasks \n2. Create a task \n3. Exit")
-	fmt.Println("Type the number of the option")
-	choice, _ := reader.ReadString('\n')
-	choice = strings.TrimSpace(choice)
-
-	switch choice {
-	case "1":
-		fmt.Println("Check tasks")
-	case "2":
-		task, taskType := createTask(reader)
-		fmt.Println("Task:", task, "with type", taskType, "has been created")
-	case "3":
-		fmt.Println("Program exited")
-		os.Exit(0)
-	default:
-		fmt.Println("Invalid choice")
 	}
 }
 
