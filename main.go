@@ -5,9 +5,32 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"log"
+	"go-learning/db"
+	"context"
 )
 
 func main() {
+	db.Init()
+	ctx := context.Background()
+
+	rows, err := db .Conn.Query(ctx, "SELECT task, type, status FROM todo")
+	if err != nil {
+		log.Fatal("Something went wrong", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var task, taskType string
+		var status bool
+
+		err := rows.Scan(&task, &taskType, &status)
+		if err != nil {
+			log.Fatal("Something went wrong", err)
+		}
+		fmt.Println("Task:", task, "| Type:", taskType, "| Completed:", status)
+	}
+
 	reader := bufio.NewReader(os.Stdin)
 
 	fmt.Println("What would you like todo?")
