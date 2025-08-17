@@ -2,17 +2,17 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"fmt"
+	"go-learning/db"
+	"log"
 	"os"
 	"strings"
-	"log"
-	"go-learning/db"
-	"context"
 )
 
 func main() {
-
-
+	db.Init()
+	ctx := context.Background()
 	reader := bufio.NewReader(os.Stdin)
 
 	fmt.Println("What would you like todo?")
@@ -24,7 +24,7 @@ func main() {
 	switch choice {
 	case "1":
 		fmt.Println("Check tasks")
-		showTasks()
+		showTasks(ctx)
 	case "2":
 		task, taskType := createTask(reader)
 		fmt.Println("Task:", task, "with type", taskType, "has been created")
@@ -36,11 +36,8 @@ func main() {
 	}
 }
 
-func showTasks(){
-	db.Init()
-	ctx := context.Background()
-
-	rows, err := db .Conn.Query(ctx, "SELECT task, type, status FROM todo")
+func showTasks(ctx context.Context) {
+	rows, err := db.Conn.Query(ctx, "SELECT task, type, status FROM todo")
 	if err != nil {
 		log.Fatal("Something went wrong", err)
 	}
