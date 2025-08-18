@@ -26,8 +26,9 @@ func main() {
 		fmt.Println("Check tasks")
 		showTasks(ctx)
 	case "2":
-		task, taskType := createTask(reader)
-		fmt.Println("Task:", task, "with type", taskType, "has been created")
+		if err := createTask(ctx, reader); err != nil {
+			log.Fatal("Failed to create task:", err)
+		}
 	case "3":
 		fmt.Println("Program exited")
 		os.Exit(0)
@@ -55,7 +56,7 @@ func showTasks(ctx context.Context) {
 	}
 }
 
-func createTask(reader *bufio.Reader) (string, string) {
+func createTask(ctx context.Context, reader *bufio.Reader) error {
 	fmt.Print("Enter wanted task: ")
 	task, _ := reader.ReadString('\n')
 	task = strings.TrimSpace(task)
@@ -64,5 +65,13 @@ func createTask(reader *bufio.Reader) (string, string) {
 	taskType, _ := reader.ReadString('\n')
 	taskType = strings.TrimSpace(taskType)
 
-	return task, taskType
+	_, err := db.Conn.Exec(ctx,
+		"INSERT INTO todo (task, type) VALUES ($1, $2)",
+		task, taskType)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("Task created succesfully")
+	return nil
 }
